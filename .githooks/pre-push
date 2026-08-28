@@ -1,0 +1,22 @@
+#!/bin/sh
+# Confidentiality gate, push edition.
+#
+# The pre-commit hook only sees one commit's staged content. This checks the
+# whole tree AND every blob in every commit, because a secret that was committed
+# and then deleted is still in the clone forever -- GitHub Pages will not serve
+# it, but anyone who clones the repo gets it.
+#
+# Also runs the self-test: a gate that has silently stopped matching is worse
+# than no gate, because it manufactures confidence.
+
+set -e
+ROOT="$(git rev-parse --show-toplevel)"
+
+python3 "$ROOT/tools/scrub.py" --self-test >/dev/null || {
+  echo "pre-push: scrub self-test FAILED -- the gate is broken, not the content." >&2
+  echo "pre-push: run 'python3 tools/scrub.py --self-test' to see which check regressed." >&2
+  exit 1
+}
+
+python3 "$ROOT/tools/scrub.py" --all
+python3 "$ROOT/tools/scrub.py" --history

@@ -1,0 +1,96 @@
+/* ==========================================================================
+   Resume sheet. Dual-mode: reads as a page on screen, prints as clean A4.
+   Lifted from the original standalone resume.html, with every literal colour
+   replaced by a token. Load after tokens.css and site.css.
+
+   The two colour substitutions matter for accessibility, not taste:
+     #c15f3c accent    4.01:1  ->  --hero  #b85536  4.54:1
+     #7d7a70 meta      4.08:1  ->  --ink3  #736c64  4.91:1
+   Both originals failed WCAG AA for body text on this paper colour.
+   ========================================================================== */
+
+@page { size: A4; margin: 16mm 18mm; }
+
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+body.resume {
+  font-family: var(--font-body);
+  color: var(--ink2);
+  font-size: 10.4pt;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.sheet { max-width: var(--page); margin: 0 auto; }
+
+/* On screen: a backdrop with a white sheet floating on it. */
+@media screen {
+  body.resume { background: var(--shell); padding: var(--sp-6) var(--sp-4); }
+  .sheet {
+    background: var(--card);
+    padding: 48px 52px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.10);
+  }
+}
+/* In print the @page margin supplies the padding, so the sheet is edge to edge. */
+@media print {
+  body.resume { background: #fff; }
+  .sheet { max-width: none; padding: 0; box-shadow: none; }
+  .resume-actions, .site-nav, .skip, .site-foot { display: none !important; }
+}
+
+/* --- header: name and contact left, portrait right --------------------- */
+.resume-head {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: var(--sp-5); margin-bottom: 26px;
+}
+.resume-head-left { flex: 1; padding-top: var(--sp-1); }
+.resume h1 {
+  font-family: var(--font-display);
+  font-size: 30pt; font-weight: 800; letter-spacing: -0.5px;
+  color: var(--ink); margin: 0 0 6px; line-height: 1.05;
+}
+.resume .tagline {
+  font-size: 10.2pt; font-weight: 600; color: var(--hero); margin: 0 0 10px;
+}
+.resume .contact-block { font-size: 9.6pt; color: var(--ink3); line-height: 1.7; }
+.resume .contact-block a { color: var(--ink3); text-decoration: underline;
+                           text-decoration-color: var(--rule); }
+.resume .photo {
+  width: 132px; height: 132px; flex: 0 0 132px;
+  border-radius: 50%; object-fit: cover;
+}
+
+/* --- sections: bold header, no rule ----------------------------------- */
+.resume h2 {
+  font-family: var(--font-display);
+  font-size: 15pt; font-weight: 700; color: var(--ink);
+  margin: 22px 0 var(--sp-2); letter-spacing: -0.2px;
+}
+.resume .summary {
+  background: var(--sunk); border-radius: var(--radius-lg);
+  padding: 14px 18px; margin: var(--sp-1) 0; color: var(--ink2);
+  max-width: none;
+}
+.resume .role-title { font-weight: 700; font-size: 11pt; color: var(--ink); }
+.resume .role-meta { color: var(--ink3); font-size: 9.4pt; margin-bottom: 6px; }
+.resume .subhead { font-weight: 600; color: var(--ink2); font-size: 10pt;
+                   margin: var(--sp-3) 0 var(--sp-1); }
+.resume ul { margin: var(--sp-1) 0 var(--sp-2); padding-left: 18px; max-width: none; }
+.resume li { margin-bottom: var(--sp-1); }
+.resume li::marker { color: var(--line); }
+.resume strong { color: var(--ink); font-weight: 700; }
+.resume code { font-family: var(--font-mono); font-size: 9pt; background: var(--sunk); }
+.resume .kv { margin: 3px 0; max-width: none; }
+.resume .kv b { color: var(--ink); }
+.resume .edu-line { margin: 3px 0; }
+.resume p { margin: 5px 0; max-width: none; }
+
+/* --- screen-only action bar above the sheet ---------------------------- */
+.resume-actions {
+  max-width: var(--page); margin: 0 auto var(--sp-4);
+  display: flex; gap: var(--sp-4); flex-wrap: wrap;
+  font-size: var(--fs-meta);
+}
+.resume-actions a { color: var(--ink2); }

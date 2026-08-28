@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hee1ko.dev/sitemap.xml

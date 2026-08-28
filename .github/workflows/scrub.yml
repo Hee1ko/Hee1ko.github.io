@@ -1,0 +1,40 @@
+name: scrub
+
+# Server-side backstop for the confidentiality gate.
+#
+# Git hooks are not cloned, and `git commit --no-verify` exists. This runs the
+# same checks where they cannot be skipped. It cannot un-publish anything, but
+# it surfaces a leak in minutes rather than never.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  scrub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history: --history needs every commit
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install poppler for PDF text extraction
+        # PDF text is Flate-compressed, so grep cannot see it. Without this the
+        # gate fails closed on any PDF, which would block the resume download.
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+
+      - name: Self-test the gate
+        # A gate that has silently stopped matching manufactures confidence.
+        # Verify it catches planted violations BEFORE trusting its verdict.
+        run: python3 tools/scrub.py --self-test
+
+      - name: Scan tracked files
+        run: python3 tools/scrub.py --all
+
+      - name: Scan full history
+        run: python3 tools/scrub.py --history

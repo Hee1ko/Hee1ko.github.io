@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Scratch space. Note: with .nojekyll present, GitHub Pages publishes
+# underscore-prefixed paths too, so there is no "_private/" convention that
+# works here. Anything not for publication does not live in this tree.
+tmp/
+scratch/
+*.orig
+*.rej
+
+# Data artifacts that must never be committed. The scrub gate also refuses
+# these by extension, because .gitignore is defeated by `git add -f` and by a
+# rename, while the gate is not.
+*.db
+*.sqlite
+*.sqlite3
+*.jsonl
+*.npy
+*.npz
+*.csv
+*.env
+catalog.md
+index/
+cases/
+logs/

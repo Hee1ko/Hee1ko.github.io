@@ -1,0 +1,185 @@
+/* ==========================================================================
+   Site styles. Uses tokens.css only -- no literal colours below this line.
+   Link order: tokens.css, then this. No @import (it serialises requests).
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink2);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- skip link: first tab stop, visible only when focused -------------- */
+.skip {
+  position: absolute; left: -9999px;
+  background: var(--ink); color: var(--paper);
+  padding: var(--sp-3) var(--sp-4); border-radius: var(--radius);
+  z-index: 100;
+}
+.skip:focus { left: var(--sp-4); top: var(--sp-4); }
+
+:focus-visible {
+  outline: 2px solid var(--hero);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* --- headings ---------------------------------------------------------- */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  color: var(--ink);
+  line-height: var(--lh-head);
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+h1 { font-size: var(--fs-1); }
+h2 { font-size: var(--fs-2); margin-top: var(--sp-8); margin-bottom: var(--sp-4); }
+h3 { font-size: var(--fs-3); margin-top: var(--sp-6); margin-bottom: var(--sp-2); }
+
+p { margin: 0 0 var(--sp-4); max-width: var(--measure); }
+strong { color: var(--ink); font-weight: 650; }
+
+a { color: var(--ink); text-decoration: underline; text-decoration-color: var(--rule);
+    text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+a:hover { text-decoration-color: var(--hero); color: var(--hero); }
+
+code, kbd {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--sunk);
+  padding: 1px var(--sp-1);
+  border-radius: var(--radius-sm);
+}
+
+ul, ol { margin: 0 0 var(--sp-4); padding-left: var(--sp-5); max-width: var(--measure); }
+li { margin-bottom: var(--sp-2); }
+li::marker { color: var(--line); }
+
+hr { border: 0; border-top: 1px solid var(--rule); margin: var(--sp-7) 0; }
+
+/* --- layout ------------------------------------------------------------ */
+.wrap  { max-width: var(--wide);  margin: 0 auto; padding: 0 var(--sp-5); }
+.prose { max-width: var(--prose); margin: 0 auto; padding: 0 var(--sp-5); }
+
+main { padding-bottom: var(--sp-9); }
+
+/* --- site header ------------------------------------------------------- */
+.site-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--sp-5); flex-wrap: wrap;
+  padding: var(--sp-5) 0;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: var(--sp-7);
+}
+.site-head .brand {
+  font-family: var(--font-display); font-weight: 700; font-size: var(--fs-3);
+  color: var(--ink); text-decoration: none; letter-spacing: -0.02em;
+}
+.site-nav { display: flex; gap: var(--sp-5); flex-wrap: wrap; }
+.site-nav a {
+  font-size: var(--fs-meta); color: var(--ink2);
+  text-decoration: none; padding-bottom: 2px;
+  border-bottom: 1.5px solid transparent;
+}
+.site-nav a:hover { color: var(--hero); border-bottom-color: var(--hero); }
+.site-nav a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--line); }
+
+/* --- hero -------------------------------------------------------------- */
+.hero { display: grid; grid-template-columns: 1fr auto; gap: var(--sp-7);
+        align-items: start; margin-bottom: var(--sp-7); }
+.hero h1 { font-size: var(--fs-hero); line-height: var(--lh-stmt);
+           letter-spacing: -0.035em; font-weight: 800; }
+.hero .lede { font-size: var(--fs-2); color: var(--ink2); line-height: 1.4;
+              margin-top: var(--sp-4); max-width: 36ch; text-wrap: pretty; }
+.hero .tagline { color: var(--hero); font-weight: 650; font-size: var(--fs-meta);
+                 letter-spacing: 0.01em; margin-bottom: var(--sp-3); }
+.portrait {
+  width: 148px; height: 148px; border-radius: 50%;
+  object-fit: cover; border: 1px solid var(--rule);
+}
+@media (max-width: 640px) {
+  .hero { grid-template-columns: 1fr; }
+  .portrait { width: 104px; height: 104px; }
+}
+
+/* --- cards -------------------------------------------------------------
+   max-width:none is load-bearing. The generic `ul` rule above sets
+   max-width:68ch for prose lists, which silently collapsed this grid from
+   three columns to two -- auto-fit was doing its job against a container
+   that was only ~578px wide.
+   ---------------------------------------------------------------------- */
+.cards {
+  display: grid; gap: var(--sp-5);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  list-style: none; padding: 0; max-width: none;
+}
+.card {
+  background: var(--card); border: 1px solid var(--rule);
+  border-radius: var(--radius-lg); padding: var(--sp-5);
+  display: flex; flex-direction: column; gap: var(--sp-3);
+}
+.card h3 { margin: 0; }
+.card h3 a { text-decoration: none; }
+.card h3 a:hover { color: var(--hero); }
+.card p { margin: 0; font-size: var(--fs-meta); }
+.card .meta { color: var(--ink3); font-size: var(--fs-micro); margin: 0; }
+
+.tags { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; padding: 0; margin: 0; max-width: none; }
+.tags li {
+  font-family: var(--font-mono); font-size: var(--fs-micro);
+  color: var(--ink3); background: var(--sunk);
+  padding: 2px var(--sp-2); border-radius: var(--radius-sm); margin: 0;
+}
+
+/* --- credential strip -------------------------------------------------- */
+.creds { display: flex; flex-wrap: wrap; gap: var(--sp-2) var(--sp-4);
+         list-style: none; padding: 0; margin: 0; max-width: none; }
+.creds li { font-size: var(--fs-meta); color: var(--ink2); margin: 0; }
+.creds li::before { content: "◆"; color: var(--hero); margin-right: var(--sp-2);
+                    font-size: 0.7em; vertical-align: 1px; }
+
+/* --- callout ----------------------------------------------------------- */
+.note {
+  background: var(--sunk); border-left: 2px solid var(--hero);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: var(--sp-4) var(--sp-5); margin: var(--sp-5) 0;
+  max-width: var(--measure);
+}
+.note :last-child { margin-bottom: 0; }
+
+/* --- contact row ------------------------------------------------------- */
+.contact { display: flex; flex-wrap: wrap; gap: var(--sp-4);
+           list-style: none; padding: 0; margin: var(--sp-5) 0 0; max-width: none; }
+.contact li { margin: 0; font-size: var(--fs-meta); }
+
+/* --- footer ------------------------------------------------------------ */
+.site-foot {
+  border-top: 1px solid var(--rule);
+  padding: var(--sp-5) 0 var(--sp-7);
+  color: var(--ink3); font-size: var(--fs-micro);
+  display: flex; flex-wrap: wrap; gap: var(--sp-4); justify-content: space-between;
+}
+.site-foot a { color: var(--ink3); }
+
+/* --- print ------------------------------------------------------------- */
+@media print {
+  .site-nav, .skip, .site-foot { display: none; }
+  body { background: #fff; }
+  a { text-decoration: none; }
+}

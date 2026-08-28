@@ -1,0 +1,77 @@
+/* ==========================================================================
+   Design tokens. Custom properties only, no selectors, so this can be linked
+   ahead of every other sheet.
+
+   One source of truth for the site, the resume, and every slide deck. Contrast
+   ratios below are measured against --paper and were verified numerically, not
+   estimated. Two colours from the original resume were replaced because they
+   fail WCAG AA for body text:
+
+     #c15f3c accent      4.01:1  ->  --hero  #b85536  4.54:1
+     #7d7a70 meta text   4.08:1  ->  --ink3  #736c64  4.91:1
+
+   Four greys and exactly one accent. Do not add a second accent.
+   ========================================================================== */
+
+:root {
+  /* --- surfaces ------------------------------------------------------- */
+  --paper: #faf9f5;   /* page ground. warm, never pure white              */
+  --card:  #ffffff;   /* raised sheet: resume page, project card, node    */
+  --sunk:  #f1f0ec;   /* code chip, callout, inset panel                 */
+  --shell: #edece7;   /* screen-only backdrop behind the resume sheet     */
+
+  /* --- ink ------------------------------------------------------------ */
+  --ink:   #1a1714;   /* 16.94:1  headings, emphasis                     */
+  --ink2:  #514b44;   /*  8.17:1  body text                             */
+  --ink3:  #736c64;   /*  4.91:1  meta, captions, dates                 */
+
+  /* --- accent (exactly one) ------------------------------------------- */
+  --hero:  #b85536;   /*  4.54:1  terracotta                            */
+
+  /* --- lines ---------------------------------------------------------- */
+  --line:  #c9c2b4;   /* diagram strokes, 1.5px                          */
+  --rule:  #e2ded4;   /* hairlines, dividers, link underlines            */
+
+  /* --- type ------------------------------------------------------------
+     System stack, deliberately. Zero bytes, zero licensing question, and
+     it already looks right -- this is the stack the resume shipped with.
+     To adopt a webfont later, change --font-display here and nowhere else;
+     confirm the licence permits redistributing the files in a public repo,
+     which is a stricter test than "free for commercial use".
+     -------------------------------------------------------------------- */
+  --font-display: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                  "Helvetica Neue", Arial, sans-serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, "Segoe UI",
+                  "Helvetica Neue", Arial, sans-serif;
+  --font-mono:    ui-monospace, "SF Mono", SFMono-Regular, Menlo, Monaco,
+                  "Courier New", monospace;
+
+  /* type scale */
+  --fs-hero: clamp(2.25rem, 6vw, 3.75rem);
+  --fs-1:    clamp(1.75rem, 4vw, 2.5rem);
+  --fs-2:    clamp(1.35rem, 3vw, 1.75rem);
+  --fs-3:    1.2rem;
+  --fs-body: 1.0625rem;
+  --fs-meta: 0.9375rem;
+  --fs-micro: 0.8125rem;
+
+  --lh-head: 1.22;
+  --lh-stmt: 1.16;
+  --lh-body: 1.62;
+
+  /* --- space ---------------------------------------------------------- */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px; --sp-7: 48px; --sp-8: 64px;
+  --sp-9: 96px;
+
+  /* --- measure -------------------------------------------------------- */
+  --measure: 68ch;  /* prose column                                       */
+  --prose:   860px; /* article width                                      */
+  --page:    720px; /* resume sheet, from the original resume.html        */
+  --wide:    1120px;
+
+  /* --- shape ---------------------------------------------------------- */
+  --radius-sm: 3px;
+  --radius:    6px;
+  --radius-lg: 8px;
+}

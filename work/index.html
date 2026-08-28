@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work — Heewon Ko</title>
+<meta name="description" content="Projects by Heewon Ko: a multi-agent diagnosis pipeline, an offline hybrid-search tool, and a self-verifying presentation engine.">
+<link rel="canonical" href="https://hee1ko.dev/work/">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="wrap">
+  <header class="site-head">
+    <a class="brand" href="/">Heewon&nbsp;Ko</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="/">Home</a>
+      <a href="/work/" aria-current="page">Work</a>
+      <a href="/resume/">Resume</a>
+      <a href="/about/">About</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <h1>Work</h1>
+    <p style="max-width:var(--measure)">
+      Things I built because the tool did not exist. Each page states the problem,
+      the design decisions and why, and what I would do differently — including
+      the tradeoffs I am not happy about.
+    </p>
+
+    <div class="note">
+      <p>
+        <strong>On what is not here.</strong> Some of my work is done inside AWS
+        on customer cases, and none of that can appear on a public site — no code,
+        no customer names, no case detail. Where a project came out of that
+        context I describe the architecture and the reasoning only. If you want
+        the depth behind it, ask me in a conversation where I can answer properly.
+      </p>
+    </div>
+
+    <ul class="cards" style="margin-top:var(--sp-7)">
+      <li class="card">
+        <h3><a href="/work/hwknest/">A multi-agent pipeline for technical diagnosis</a></h3>
+        <p>
+          A script holds the control flow; the agents do the thinking. Redundant
+          parallel investigation, then reconciliation, then a
+          build-then-independently-verify gate before a word gets written.
+        </p>
+        <ul class="tags"><li>Python</li><li>multi-agent</li><li>orchestration</li></ul>
+        <p class="meta">2026 · architecture write-up, code not public</p>
+      </li>
+      <li class="card">
+        <h3><a href="/work/casework-rag/">Offline hybrid search over a personal case archive</a></h3>
+        <p>
+          Semantic similarity and SQLite full-text search, fused by reciprocal
+          rank. Local ONNX embeddings, two dependencies, no network calls at all.
+          554 lines.
+        </p>
+        <ul class="tags"><li>Python</li><li>ONNX</li><li>SQLite FTS5</li><li>RRF</li></ul>
+        <p class="meta">2026 · write-up and source</p>
+      </li>
+      <li class="card">
+        <h3><a href="/work/deck-engine/">A presentation engine that checks its own layout</a></h3>
+        <p>
+          Slides as a plain data array, no framework, and an in-page probe that
+          measures every slide against the real obstacle and reports overflow to
+          a headless browser.
+        </p>
+        <ul class="tags"><li>HTML</li><li>CSS</li><li>vanilla JS</li></ul>
+        <p class="meta">2026 · write-up and source</p>
+      </li>
+    </ul>
+  </main>
+
+  <footer class="site-foot">
+    <span>© 2026 Heewon Ko</span>
+    <span><a href="/">Home</a></span>
+  </footer>
+</div>
+</body>
+</html>

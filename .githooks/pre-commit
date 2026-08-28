@@ -1,0 +1,14 @@
+#!/bin/sh
+# Confidentiality gate. This repo is public.
+#
+# Scans STAGED content (read from the git index, not the worktree) and aborts
+# the commit on any blocking finding.
+#
+# Installed by tools/install-hooks.sh, which sets core.hooksPath=.githooks so
+# the hook is version-controlled instead of living in an untracked .git/hooks.
+#
+# `git commit --no-verify` bypasses this by design. That is exactly why
+# .github/workflows/scrub.yml runs the same gate server-side.
+
+set -e
+exec python3 "$(git rev-parse --show-toplevel)/tools/scrub.py" --staged
