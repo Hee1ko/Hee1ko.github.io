@@ -78,11 +78,14 @@ body.hub-page {
   /* Mono, to tie the wordmark to the credential line opposite it and to the
      spec blocks in the preview card -- and because mono numerals sit level
      with caps, which matters when the mark contains a 1.
-     Tracking is lower than the display version would need: mono advance
-     widths are already wide, so 0.14em here reads as gappy. */
-  font-family: var(--font-mono); font-weight: 700;
-  font-size: 1.05rem; color: var(--ink);
-  letter-spacing: 0.08em; margin: 0;
+     Weight 800 is as heavy as this stack goes -- 800 and 900 render
+     identically because the mono faces here top out at Bold, so asking for 900
+     buys nothing. Tracking is 0.02em: mono advance widths are already wide, and
+     at 0 or negative the glyphs start to crowd. The size is bumped to 1.15rem
+     because tightening the tracking makes the mark read smaller. */
+  font-family: var(--font-mono); font-weight: 800;
+  font-size: 1.15rem; color: var(--ink);
+  letter-spacing: 0.02em; margin: 0;
 }
 .hub-creds {
   font-family: var(--font-mono); font-size: var(--fs-micro);

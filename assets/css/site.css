@@ -89,9 +89,9 @@ main { padding-bottom: var(--sp-9); }
 }
 .site-head .brand {
   /* Same wordmark as .hub-name in hub.css -- keep the two rules in sync. */
-  font-family: var(--font-mono); font-weight: 700; font-size: 1.05rem;
+  font-family: var(--font-mono); font-weight: 800; font-size: 1.15rem;
   color: var(--ink); text-decoration: none;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
 }
 .site-head .brand:hover { color: var(--hero); }
 .site-nav { display: flex; gap: var(--sp-5); flex-wrap: wrap; }
