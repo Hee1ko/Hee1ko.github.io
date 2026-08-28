@@ -75,11 +75,14 @@ body.hub-page {
   border-bottom: 1px solid var(--rule);
 }
 .hub-name {
-  font-family: var(--font-display); font-weight: 700;
+  /* Mono, to tie the wordmark to the credential line opposite it and to the
+     spec blocks in the preview card -- and because mono numerals sit level
+     with caps, which matters when the mark contains a 1.
+     Tracking is lower than the display version would need: mono advance
+     widths are already wide, so 0.14em here reads as gappy. */
+  font-family: var(--font-mono); font-weight: 700;
   font-size: 1.05rem; color: var(--ink);
-  /* A caps wordmark needs POSITIVE tracking. The negative letter-spacing that
-     suited "Heewon Ko" as a name makes "HEE1KO" read as a cramped acronym. */
-  letter-spacing: 0.14em; margin: 0;
+  letter-spacing: 0.08em; margin: 0;
 }
 .hub-creds {
   font-family: var(--font-mono); font-size: var(--fs-micro);

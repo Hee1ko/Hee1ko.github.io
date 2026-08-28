@@ -88,11 +88,10 @@ main { padding-bottom: var(--sp-9); }
   margin-bottom: var(--sp-7);
 }
 .site-head .brand {
-  font-family: var(--font-display); font-weight: 700; font-size: 1.05rem;
+  /* Same wordmark as .hub-name in hub.css -- keep the two rules in sync. */
+  font-family: var(--font-mono); font-weight: 700; font-size: 1.05rem;
   color: var(--ink); text-decoration: none;
-  /* Positive tracking: see the note on .hub-name in hub.css. Keep these two
-     rules in sync -- it is the same wordmark. */
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;
 }
 .site-head .brand:hover { color: var(--hero); }
 .site-nav { display: flex; gap: var(--sp-5); flex-wrap: wrap; }
