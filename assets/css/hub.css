@@ -80,12 +80,15 @@ body.hub-page {
      with caps, which matters when the mark contains a 1.
      Weight 800 is as heavy as this stack goes -- 800 and 900 render
      identically because the mono faces here top out at Bold, so asking for 900
-     buys nothing. Tracking is 0.02em: mono advance widths are already wide, and
-     at 0 or negative the glyphs start to crowd. The size is bumped to 1.15rem
-     because tightening the tracking makes the mark read smaller. */
+     buys nothing. Tracking is -0.035em, which pulls the fixed mono advance
+     widths in until the glyphs nearly touch and the mark reads as one block.
+     -0.05em and beyond was tried and rejected: mono has no side-bearing slack
+     to reclaim, so negative tracking collides glyphs rather than kerning them,
+     and letters start overlapping. The size is 1.15rem to compensate for
+     tightening making the mark read smaller. */
   font-family: var(--font-mono); font-weight: 800;
   font-size: 1.15rem; color: var(--ink);
-  letter-spacing: 0.02em; margin: 0;
+  letter-spacing: -0.035em; margin: 0;
 }
 .hub-creds {
   font-family: var(--font-mono); font-size: var(--fs-micro);
