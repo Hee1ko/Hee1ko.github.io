@@ -1,4 +1,4 @@
-# hee1ko.dev
+# hee1ko.com
 
 My personal site: resume, work history, and write-ups of things I have built.
 

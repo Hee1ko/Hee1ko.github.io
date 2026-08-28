@@ -5,125 +5,221 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Heewon Ko — cloud support engineer, Sydney</title>
 <meta name="description" content="Heewon Ko builds diagnostic and agentic tooling for cloud support work. AWS support engineer in Sydney, 5x AWS certified, with a background in architecture and design.">
-<link rel="canonical" href="https://hee1ko.dev/">
+<link rel="canonical" href="https://hee1ko.com/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Heewon Ko — cloud support engineer, Sydney">
 <meta property="og:description" content="Builds diagnostic and agentic tooling for cloud support work. Non-linear path: architecture, design, then cloud.">
-<meta property="og:url" content="https://hee1ko.dev/">
+<meta property="og:url" content="https://hee1ko.com/">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/assets/css/tokens.css">
-<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="stylesheet" href="/assets/css/hub.css">
 </head>
-<body>
-<a class="skip" href="#main">Skip to content</a>
+<body class="hub-page">
 
-<div class="wrap">
-  <header class="site-head">
-    <a class="brand" href="/">Heewon&nbsp;Ko</a>
-    <nav class="site-nav" aria-label="Main">
-      <a href="/" aria-current="page">Home</a>
-      <a href="/work/">Work</a>
-      <a href="/resume/">Resume</a>
-      <a href="/about/">About</a>
-    </nav>
-  </header>
+<div class="hub">
 
-  <main id="main">
+  <div class="hub-top">
+    <p class="hub-name">Heewon&nbsp;Ko</p>
+    <p class="hub-creds"><b>5×</b> AWS Certified &nbsp;·&nbsp; Sydney, Australia</p>
+  </div>
 
-    <section class="hero">
-      <div>
-        <p class="tagline">Sydney, Australia</p>
-        <h1>I build the tooling that makes hard problems legible.</h1>
-        <p class="lede">
-          Cloud support engineer at AWS, working on generative-AI services.
-          I reproduce before I answer, and I build the diagnostic tools I wish
-          I had.
-        </p>
-      </div>
-      <picture>
-        <source srcset="/assets/img/headshot.webp" type="image/webp">
-        <img class="portrait" src="/assets/img/headshot.png" alt="Heewon Ko" width="148" height="148">
-      </picture>
-    </section>
+  <div class="hub-main">
 
-    <p>
-      My route here was not a straight line. I trained as an architect, spent six
-      years as a graphic and UX designer across Seoul, Brazil and Sydney, taught
-      myself Python to contribute to a health-tech product API, and retrained
-      formally into cloud. The design years are not a detour I explain away —
-      they are why I care whether an interface, a diagram or an error message
-      actually lands.
-    </p>
-    <p>
-      Day to day I work deep-dive customer cases on Amazon Bedrock, Bedrock
-      AgentCore and SageMaker for regulated enterprises. The work I am proudest
-      of is the tooling around it.
+    <h1 class="hub-stmt">I build the tooling that makes hard problems legible.</h1>
+
+    <p class="hub-meta">
+      Cloud support engineer at <b>AWS</b>, working on generative-AI services.
+      I reproduce before I answer, and I build the diagnostic tools I wish I had.
     </p>
 
-    <h2>Selected work</h2>
-    <ul class="cards">
-      <li class="card">
-        <h3><a href="/work/hwknest/">A multi-agent pipeline for technical diagnosis</a></h3>
-        <p>
-          Investigation work starts cold every time. I built a pipeline where a
-          script holds the control flow and the agents do the thinking — with
-          redundant parallel investigation, reconciliation, and a
-          build-then-independently-verify gate before anything is written.
-        </p>
-        <ul class="tags"><li>Python</li><li>multi-agent</li><li>architecture</li></ul>
-        <p class="meta">Architecture write-up · code not public</p>
-      </li>
-      <li class="card">
-        <h3><a href="/work/casework-rag/">Offline hybrid search over my own case archive</a></h3>
-        <p>
-          Semantic and full-text retrieval fused by reciprocal rank, running
-          entirely on-device with two dependencies and no API calls. 554 lines.
-        </p>
-        <ul class="tags"><li>Python</li><li>ONNX</li><li>SQLite FTS5</li></ul>
-        <p class="meta">Write-up · source available</p>
-      </li>
-      <li class="card">
-        <h3><a href="/work/deck-engine/">A presentation engine that checks its own layout</a></h3>
-        <p>
-          Slides as a data array, no framework, and a probe that measures every
-          slide for overflow and reports it to a headless browser. Because
-          "looks fine on my laptop" is not a test.
-        </p>
-        <ul class="tags"><li>HTML</li><li>CSS</li><li>vanilla JS</li></ul>
-        <p class="meta">Write-up · source available</p>
-      </li>
-    </ul>
+    <div class="hub-group">
+      <p class="hub-label">Work</p>
+      <ul class="hub-list">
+        <li>
+          <a class="row" href="/work/hwknest/" data-pv="pipeline">
+            <span class="arrow" aria-hidden="true">→</span>
+            <span class="row-t">Multi-agent diagnosis pipeline</span>
+            <span class="row-x">architecture</span>
+          </a>
+        </li>
+        <li>
+          <a class="row" href="/work/casework-rag/" data-pv="retrieval">
+            <span class="arrow" aria-hidden="true">→</span>
+            <span class="row-t">Offline hybrid retrieval</span>
+            <span class="row-x">python</span>
+          </a>
+        </li>
+        <li>
+          <a class="row" href="/work/deck-engine/" data-pv="deck">
+            <span class="arrow" aria-hidden="true">→</span>
+            <span class="row-t">Self-checking deck engine</span>
+            <span class="row-x">html · css · js</span>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-    <h2>Certifications</h2>
-    <ul class="creds">
-      <li>Solutions Architect – Associate</li>
-      <li>Machine Learning Engineer – Associate</li>
-      <li>Data Engineer – Associate</li>
-      <li>AI Practitioner</li>
-      <li>Cloud Practitioner</li>
-    </ul>
-    <p class="meta" style="color:var(--ink3);font-size:var(--fs-micro);margin-top:var(--sp-3)">
-      Five AWS certifications, earned Apr–Nov 2025. Currently studying for the
-      Generative AI Developer – Professional.
-    </p>
+    <div class="hub-group">
+      <p class="hub-label">Elsewhere</p>
+      <ul class="hub-list inline">
+        <li>
+          <a class="row" href="/resume/" data-pv="cv">
+            <span class="arrow" aria-hidden="true">→</span><span class="row-t">CV</span>
+          </a>
+        </li>
+        <li>
+          <a class="row" href="/about/" data-pv="about">
+            <span class="arrow" aria-hidden="true">→</span><span class="row-t">About</span>
+          </a>
+        </li>
+        <li>
+          <a class="row" href="https://github.com/Hee1ko" rel="me" data-pv="github">
+            <span class="arrow" aria-hidden="true">→</span><span class="row-t">GitHub</span>
+          </a>
+        </li>
+        <li>
+          <a class="row" href="https://www.linkedin.com/in/hee1ko" rel="me" data-pv="linkedin">
+            <span class="arrow" aria-hidden="true">→</span><span class="row-t">LinkedIn</span>
+          </a>
+        </li>
+        <li>
+          <a class="row" href="mailto:hee1ko@gmail.com" data-pv="email">
+            <span class="arrow" aria-hidden="true">→</span><span class="row-t">Email</span>
+          </a>
+        </li>
+      </ul>
+    </div>
 
-    <h2>Get in touch</h2>
-    <p>
-      I am always happy to talk about agentic systems, support engineering, or
-      career changes into cloud.
-    </p>
-    <ul class="contact">
-      <li><a href="mailto:hee1ko@gmail.com">hee1ko@gmail.com</a></li>
-      <li><a href="https://www.linkedin.com/in/hee1ko" rel="me">LinkedIn</a></li>
-      <li><a href="https://github.com/Hee1ko" rel="me">GitHub</a></li>
-    </ul>
+  </div>
 
-  </main>
+  <!-- Preview panel. Purely presentational: every panel duplicates information
+       that is already reachable through the link it describes, so a reader who
+       never triggers a hover loses nothing. aria-hidden keeps screen readers
+       from announcing eight redundant blocks. -->
+  <aside class="hub-preview" aria-hidden="true">
 
-  <footer class="site-foot">
+    <div class="pv pv-default">
+      <p class="pv-kicker">Portfolio</p>
+      <h2>Three things I built because the tool did not exist.</h2>
+      <p>
+        Point at anything on the left for the short version. Each project page
+        states the problem, the design decisions and why, and the tradeoffs I am
+        not happy about.
+      </p>
+      <dl>
+        <dt>Based</dt><dd>Sydney, Australia</dd>
+        <dt>Now</dt><dd>Support engineer, AWS</dd>
+        <dt>Before</dt><dd>Architecture, then design</dd>
+      </dl>
+    </div>
+
+    <div class="pv" data-pv-for="pipeline">
+      <p class="pv-kicker">Architecture write-up</p>
+      <h2>Multi-agent diagnosis pipeline</h2>
+      <p>
+        A script holds the control flow; the agents do the thinking. Redundant
+        parallel investigation, then reconciliation, then a
+        build-then-independently-verify gate before a word gets written.
+      </p>
+      <dl>
+        <dt>Stack</dt><dd>Python, shell, agent runtime</dd>
+        <dt>Scale</dt><dd>~65 tool modules, ~1,900 tests</dd>
+        <dt>Code</dt><dd>Not public — internal systems</dd>
+      </dl>
+    </div>
+
+    <div class="pv" data-pv-for="retrieval">
+      <p class="pv-kicker">Write-up and source</p>
+      <h2>Offline hybrid retrieval</h2>
+      <p>
+        Semantic similarity and SQLite full-text search, fused by reciprocal
+        rank so two incomparable score scales never have to be normalised.
+        Local ONNX embeddings, no network calls at all.
+      </p>
+      <dl>
+        <dt>Stack</dt><dd>Python, ONNX, SQLite FTS5</dd>
+        <dt>Size</dt><dd>554 lines, 2 dependencies</dd>
+        <dt>Index</dt><dd>49 cases, ~3,400 chunks</dd>
+      </dl>
+    </div>
+
+    <div class="pv" data-pv-for="deck">
+      <p class="pv-kicker">Write-up and source</p>
+      <h2>Self-checking deck engine</h2>
+      <p>
+        Slides as a plain data array, about forty lines of JavaScript, and a
+        probe that measures every slide for overflow and reports it to a
+        headless browser. Because "looks fine on my laptop" is not a test.
+      </p>
+      <dl>
+        <dt>Stack</dt><dd>HTML, CSS, vanilla JS</dd>
+        <dt>Engine</dt><dd>~40 lines, no dependencies</dd>
+        <dt>Checks</dt><dd>Per-slide overflow, in CI</dd>
+      </dl>
+    </div>
+
+    <div class="pv" data-pv-for="cv">
+      <p class="pv-kicker">Curriculum vitae</p>
+      <h2>The one-page version</h2>
+      <p>
+        Experience, education, certifications and skills, on screen or as a PDF.
+        It prints properly, which took more effort than it should have.
+      </p>
+      <dl>
+        <dt>Formats</dt><dd>HTML and PDF</dd>
+        <dt>Certs</dt><dd>5 AWS, Apr–Nov 2025</dd>
+        <dt>Now</dt><dd>GenAI Developer – Professional</dd>
+      </dl>
+    </div>
+
+    <div class="pv" data-pv-for="about">
+      <p class="pv-kicker">About</p>
+      <h2>Architecture, then design, then cloud</h2>
+      <p>
+        The long version of a non-linear path: an architecture degree in Seoul,
+        ten years of graphic and UX design across three countries, Python learned
+        to contribute to a product API, then a deliberate retrain into cloud.
+      </p>
+      <dl>
+        <dt>Languages</dt><dd>Korean, English, Portuguese</dd>
+        <dt>Studying</dt><dd>Dip. Cloud Computing, Swinburne</dd>
+      </dl>
+    </div>
+
+    <div class="pv" data-pv-for="github">
+      <p class="pv-kicker">External</p>
+      <h2>GitHub</h2>
+      <p>
+        Source for the projects that can be public, including this site and the
+        confidentiality gate that keeps customer work out of it.
+      </p>
+      <dl><dt>Handle</dt><dd>@Hee1ko</dd></dl>
+    </div>
+
+    <div class="pv" data-pv-for="linkedin">
+      <p class="pv-kicker">External</p>
+      <h2>LinkedIn</h2>
+      <p>The professional record, and the better place to reach me about roles.</p>
+      <dl><dt>Handle</dt><dd>in/hee1ko</dd></dl>
+    </div>
+
+    <div class="pv" data-pv-for="email">
+      <p class="pv-kicker">Contact</p>
+      <h2>Say hello</h2>
+      <p>
+        Happy to talk about agentic systems, support engineering, or changing
+        career into cloud. I answer everything that is not a template.
+      </p>
+      <dl><dt>Email</dt><dd>hee1ko@gmail.com</dd></dl>
+    </div>
+
+  </aside>
+
+  <footer class="hub-foot">
     <span>© 2026 Heewon Ko</span>
     <span>Hand-written HTML. No framework, no tracking, no cookies.</span>
   </footer>
+
 </div>
 </body>
 </html>

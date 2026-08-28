@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hee1ko.dev/sitemap.xml
+Sitemap: https://hee1ko.com/sitemap.xml

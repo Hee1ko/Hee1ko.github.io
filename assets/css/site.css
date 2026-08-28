@@ -154,6 +154,16 @@ main { padding-bottom: var(--sp-9); }
 .creds li::before { content: "◆"; color: var(--hero); margin-right: var(--sp-2);
                     font-size: 0.7em; vertical-align: 1px; }
 
+/* --- about intro: prose left, portrait right ---------------------------- */
+.about-intro {
+  display: grid; grid-template-columns: 1fr auto; gap: var(--sp-6);
+  align-items: start; margin-bottom: var(--sp-5);
+}
+.about-intro p:last-child { margin-bottom: 0; }
+@media (max-width: 640px) {
+  .about-intro { grid-template-columns: 1fr; }
+}
+
 /* --- project page ------------------------------------------------------- */
 .proj-lede { font-size: var(--fs-2); color: var(--ink2); line-height: 1.4;
              margin: var(--sp-4) 0 var(--sp-5); max-width: 46ch; text-wrap: pretty; }

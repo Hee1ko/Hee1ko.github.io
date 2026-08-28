@@ -1,0 +1,268 @@
+/* ==========================================================================
+   Landing hub. One screen, no scrolling, no JavaScript.
+
+   Three decisions worth knowing before editing this file:
+
+   1. HEIGHT IS `svh`, NOT `vh` OR `dvh`.
+      `100vh` ignores the mobile address bar and overflows on load. `100dvh`
+      tracks the toolbar but updates throttled -- not at 60fps, sometimes
+      debounced entirely -- so anything sized in it visibly steps. `svh` is the
+      small viewport: stable, and guaranteed not to clip in either toolbar
+      state. All three are identical on desktop, so the bug this avoids does
+      not reproduce on the machine this was built on.
+
+   2. NOTHING IS EVER CLIPPED TO KEEP IT ON ONE SCREEN.
+      WCAG 1.4.10 Reflow requires this content to work at 320 CSS px
+      equivalent -- a 1280px layout at 400% zoom -- and hiding content to
+      protect a one-screen constraint is failure F102. The first version of this
+      file used `overflow:hidden` on the body and silently ate 56px including
+      the footer at 1280x800. So: the page is one screen because the content
+      measurably fits, not because scrolling was forbidden. There is no
+      body-level `overflow:hidden` and there must not be one. Past the
+      breakpoint at the bottom of this file the hub becomes an ordinary
+      scrolling column. Do not "fix" that by forcing the fixed layout at all
+      sizes. If you add content here, re-run the height measurement.
+
+   3. THE PREVIEW IS CSS-ONLY, VIA `:has()`.
+      No JS, so it survives with scripting disabled. It also sidesteps WCAG
+      1.4.13: the panel occupies its own column and never obscures or replaces
+      other content, which is that criterion's stated exception for the
+      dismissable requirement. The panel always shows something -- a default
+      when nothing is active -- so it can never vanish while the pointer is
+      travelling toward it (failure F95), and there is no auto-hide timer.
+      The swap is keyed on `:hover, :focus` -- plain `:focus`, not
+      `:focus-visible`, because a hover-only trigger fails WCAG 2.1.1 Keyboard
+      and because `:focus` is deterministically testable. The visible focus
+      RING stays on `:focus-visible` so a mouse click does not leave one behind.
+   ========================================================================== */
+
+/* The hub page loads only tokens.css and this file -- deliberately, since it
+   shares almost no components with the rest of the site. That means the reset
+   in site.css does NOT apply here, so it has to be repeated. Without it the
+   hub's vertical padding sits outside `min-height:100svh` and the page is
+   exactly padding-height too tall at every viewport size. */
+*, *::before, *::after { box-sizing: border-box; }
+
+body.hub-page {
+  min-height: 100svh;
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink2);
+  font-family: var(--font-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.hub {
+  min-height: 100svh;
+  max-width: var(--wide);
+  margin: 0 auto;
+  padding: var(--sp-5) var(--sp-5) var(--sp-4);
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  column-gap: var(--sp-8);
+  row-gap: var(--sp-4);
+  align-content: start;
+}
+
+/* --- top line: name left, credential count right ----------------------- */
+.hub-top {
+  grid-column: 1 / -1;
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--sp-5); flex-wrap: wrap;
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--rule);
+}
+.hub-name {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: var(--fs-3); color: var(--ink);
+  letter-spacing: -0.02em; margin: 0;
+}
+.hub-creds {
+  font-family: var(--font-mono); font-size: var(--fs-micro);
+  color: var(--ink3); letter-spacing: 0.04em; text-transform: uppercase;
+}
+.hub-creds b { color: var(--hero); font-weight: 700; }
+
+/* --- left column ------------------------------------------------------- */
+.hub-main { grid-column: 1; display: flex; flex-direction: column; gap: var(--sp-4); }
+
+.hub-stmt {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4.2vw, 3.05rem);
+  line-height: 1.08; letter-spacing: -0.035em; font-weight: 800;
+  color: var(--ink); margin: 0; text-wrap: balance;
+}
+.hub-meta {
+  font-size: var(--fs-meta); color: var(--ink3);
+  margin: 0; max-width: 56ch;
+}
+.hub-meta b { color: var(--ink2); font-weight: 600; }
+
+/* --- destination lists ------------------------------------------------- */
+.hub-group { margin: 0; }
+.hub-label {
+  font-family: var(--font-mono); font-size: var(--fs-micro);
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink3);
+  display: flex; align-items: center; gap: var(--sp-3);
+  margin-bottom: var(--sp-2);
+}
+.hub-label::after {
+  content: ""; flex: 1; height: 1px; background: var(--rule);
+}
+.hub-list { list-style: none; margin: 0; padding: 0; max-width: none; }
+.hub-list li { margin: 0; }
+
+.row {
+  display: flex; align-items: baseline; gap: var(--sp-3);
+  padding: 6px var(--sp-2) 6px 0;
+  color: var(--ink); text-decoration: none;
+  font-size: 1.0625rem;
+  border-bottom: 1px solid transparent;
+}
+.row .arrow { color: var(--line); flex: 0 0 auto; transition: color .15s, transform .15s; }
+.row .row-t { font-weight: 600; }
+.row .row-x {
+  margin-left: auto; font-family: var(--font-mono);
+  font-size: var(--fs-micro); color: var(--ink3); flex: 0 0 auto;
+}
+.row:hover, .row:focus {
+  color: var(--hero); border-bottom-color: var(--rule); outline: none;
+}
+.row:hover .arrow, .row:focus .arrow {
+  color: var(--hero); transform: translateX(3px);
+}
+/* Keyboard users must still get an unmistakable focus ring, not just colour. */
+.row:focus-visible { outline: 2px solid var(--hero); outline-offset: 2px; }
+
+/* Inline row group for the short external links. */
+.hub-list.inline { display: flex; flex-wrap: wrap; gap: 0 var(--sp-5); }
+.hub-list.inline .row-x { display: none; }
+
+/* --- preview panel ----------------------------------------------------- */
+.hub-preview {
+  grid-column: 2; grid-row: 2;
+  /* Two things here, both learned the hard way.
+
+     `align-self: start` stops the card stretching to fill the 1fr row. Left to
+     stretch it reached ~650px with a hollow middle.
+
+     Every .pv is stacked into ONE grid cell via `grid-area: 1/1` rather than
+     being absolutely positioned, so the card's height is the height of its
+     TALLEST panel, computed at whatever width the column happens to be. Two
+     earlier attempts failed: absolute positioning gave the card no intrinsic
+     height at all, and a fixed `height: clamp(...)` clipped the About panel by
+     35px at 880px wide, where the narrower column forces extra wrapping.
+     Sizing to content removes the class of bug rather than tuning a constant,
+     so adding a longer panel later cannot silently truncate it. */
+  align-self: start;
+  display: grid;
+  grid-template: minmax(300px, auto) / 1fr;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.pv {
+  grid-area: 1 / 1;
+  padding: var(--sp-5);
+  display: flex; flex-direction: column; gap: var(--sp-3);
+  opacity: 0; visibility: hidden;
+  transition: opacity .18s ease;
+}
+.pv-default { opacity: 1; visibility: visible; }
+.pv h2 {
+  font-family: var(--font-display); font-size: 1.25rem; line-height: 1.25;
+  color: var(--ink); margin: 0; letter-spacing: -0.02em;
+}
+.pv p { margin: 0; font-size: var(--fs-meta); max-width: none; }
+.pv .pv-kicker {
+  font-family: var(--font-mono); font-size: var(--fs-micro);
+  text-transform: uppercase; letter-spacing: 0.1em; color: var(--hero);
+}
+.pv dl {
+  margin: auto 0 0; padding-top: var(--sp-4);
+  border-top: 1px solid var(--rule);
+  display: grid; grid-template-columns: auto 1fr; gap: var(--sp-1) var(--sp-4);
+  font-family: var(--font-mono); font-size: var(--fs-micro);
+}
+.pv dt { color: var(--ink3); text-transform: uppercase; letter-spacing: 0.06em; }
+.pv dd { margin: 0; color: var(--ink2); }
+
+/* --- the swap ----------------------------------------------------------
+   Any active row hides the default; the matching row shows its own panel.
+   Written out per row rather than generated, because there are six of them
+   and a build step to avoid the repetition would cost more than it saves.
+   ---------------------------------------------------------------------- */
+.hub:has(.row:hover) .pv-default,
+.hub:has(.row:focus) .pv-default { opacity: 0; visibility: hidden; }
+
+.hub:has([data-pv="pipeline"]:hover)  [data-pv-for="pipeline"],
+.hub:has([data-pv="pipeline"]:focus)  [data-pv-for="pipeline"],
+.hub:has([data-pv="retrieval"]:hover) [data-pv-for="retrieval"],
+.hub:has([data-pv="retrieval"]:focus) [data-pv-for="retrieval"],
+.hub:has([data-pv="deck"]:hover)      [data-pv-for="deck"],
+.hub:has([data-pv="deck"]:focus)      [data-pv-for="deck"],
+.hub:has([data-pv="cv"]:hover)        [data-pv-for="cv"],
+.hub:has([data-pv="cv"]:focus)        [data-pv-for="cv"],
+.hub:has([data-pv="github"]:hover)    [data-pv-for="github"],
+.hub:has([data-pv="github"]:focus)    [data-pv-for="github"],
+.hub:has([data-pv="linkedin"]:hover)  [data-pv-for="linkedin"],
+.hub:has([data-pv="linkedin"]:focus)  [data-pv-for="linkedin"],
+.hub:has([data-pv="email"]:hover)     [data-pv-for="email"],
+.hub:has([data-pv="email"]:focus)     [data-pv-for="email"],
+.hub:has([data-pv="about"]:hover)     [data-pv-for="about"],
+.hub:has([data-pv="about"]:focus)     [data-pv-for="about"] {
+  opacity: 1; visibility: visible;
+}
+
+/* --- footer ------------------------------------------------------------ */
+.hub-foot {
+  grid-column: 1 / -1;
+  display: flex; flex-wrap: wrap; gap: var(--sp-4); justify-content: space-between;
+  padding-top: var(--sp-3);
+  border-top: 1px solid var(--rule);
+  color: var(--ink3); font-size: var(--fs-micro);
+}
+.hub-foot a { color: var(--ink3); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pv, .row .arrow { transition: none; }
+}
+
+/* ==========================================================================
+   Reflow. Past this point one screen is a worse experience than scrolling,
+   so the hub stops pretending and becomes a normal column. This branch is
+   what keeps the design WCAG 1.4.10 conformant at 400% zoom -- it is not a
+   mobile nicety, it is the accessibility story.
+   ========================================================================== */
+@media (min-width: 860px) and (min-height: 700px) {
+  .hub { height: 100svh; }
+}
+
+/* Deliberately NO `overflow: hidden` anywhere. An earlier version clipped
+   56px at 1280x800 and ate the footer. The page is one screen because the
+   content fits, verified by measurement -- not because scrolling was
+   forbidden. If content ever does exceed the viewport, a scrollbar is the
+   correct outcome, not a hidden footer. */
+
+@media (max-width: 859px), (max-height: 699px) {
+  .hub {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--sp-6);
+    padding-bottom: var(--sp-7);
+  }
+  .hub-main, .hub-preview { grid-column: 1; }
+  .hub-preview {
+    grid-row: auto;
+    position: static; min-height: 0;
+  }
+  /* Stacked, the panels cannot overlay each other -- so show the default one
+     as ordinary content and drop the hover behaviour entirely. Nothing is
+     hidden that a reader cannot reach. */
+  .pv { position: static; opacity: 1; visibility: visible; display: none; }
+  .pv-default { display: flex; }
+  .hub:has(.row:hover) .pv-default,
+  .hub:has(.row:focus) .pv-default { opacity: 1; visibility: visible; }
+}
