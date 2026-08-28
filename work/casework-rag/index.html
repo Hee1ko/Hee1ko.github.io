@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Offline hybrid search over a personal case archive — Heewon Ko</title>
+<meta name="description" content="A 554-line hybrid retrieval tool: semantic similarity plus SQLite full-text search fused by reciprocal rank, running entirely on-device with two dependencies.">
+<link rel="canonical" href="https://hee1ko.dev/work/casework-rag/">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="wrap">
+  <header class="site-head">
+    <a class="brand" href="/">Heewon&nbsp;Ko</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="/">Home</a>
+      <a href="/work/" aria-current="page">Work</a>
+      <a href="/resume/">Resume</a>
+      <a href="/about/">About</a>
+    </nav>
+  </header>
+</div>
+
+<main id="main" class="prose">
+
+  <p style="font-size:var(--fs-meta);color:var(--ink3);margin-bottom:var(--sp-3)">
+    <a href="/work/">← Work</a>
+  </p>
+
+  <h1>Offline hybrid search over a personal case archive</h1>
+  <p class="proj-lede">
+    Semantic similarity and full-text search, fused by reciprocal rank, running
+    entirely on my own machine with two dependencies and no network calls at all.
+  </p>
+
+  <dl class="proj-meta">
+    <div><dt>Year</dt><dd>2026</dd></div>
+    <div><dt>Role</dt><dd>Sole author</dd></div>
+    <div><dt>Size</dt><dd>554 lines, one module</dd></div>
+    <div><dt>Stack</dt><dd>Python, ONNX, SQLite FTS5</dd></div>
+  </dl>
+
+  <h2>The problem</h2>
+  <p>
+    Over a year of support work I accumulated a few hundred pages of my own case
+    notes. The knowledge was real and it was mine, and it was completely
+    inaccessible — I could remember that I had solved something like this before
+    without being able to find which case, or what the answer turned out to be.
+  </p>
+  <p>
+    Full-text search alone did not work, because the useful match is rarely a
+    shared keyword. Two cases about the same root cause routinely describe it in
+    different vocabulary. Semantic search alone did not work either: it happily
+    returns five notes that are thematically adjacent and none that contain the
+    exact error string I actually typed.
+  </p>
+
+  <h2>The approach</h2>
+  <p>
+    Run both, and combine them properly. The two retrieval methods fail in
+    opposite directions, so the design goal was to let each cover the other's
+    blind spot without letting either dominate.
+  </p>
+  <ul>
+    <li>
+      <strong>Semantic ranking</strong> over embeddings generated locally with
+      <code>BAAI/bge-small-en-v1.5</code> through ONNX. Cosine similarity against
+      a plain NumPy array — at this corpus size a vector database would be
+      infrastructure with nothing to do.
+    </li>
+    <li>
+      <strong>Lexical ranking</strong> with SQLite FTS5, which is already in the
+      Python standard library and needs no service to run.
+    </li>
+    <li>
+      <strong>Reciprocal rank fusion</strong> to merge them. RRF combines by
+      <em>position</em> in each result list rather than by score, which matters
+      because a cosine similarity and an FTS5 relevance score are not on
+      comparable scales and normalising them is guesswork. RRF sidesteps the
+      question entirely.
+    </li>
+  </ul>
+  <p>
+    Documents are chunked at 900 characters with 150 characters of overlap, then
+    results are regrouped by case so one long note cannot flood the top of the
+    list with six of its own fragments.
+  </p>
+
+  <h2>Architecture</h2>
+  <p>
+    Four subcommands over one flow. <code>build</code> walks the archive, parses
+    each note's sections, chunks them, embeds them, and writes three artifacts: a
+    NumPy array of vectors, an FTS5 index, and a JSON catalogue.
+    <code>search</code> runs both rankers and fuses them. <code>catalog</code> and
+    <code>stats</code> report on the corpus.
+  </p>
+  <p>
+    The deliberate constraint was <strong>no network, ever</strong>. Embeddings
+    run on-device, the index is local files, and there is no API key to leak or
+    rate limit to hit. Two third-party dependencies total. That was not
+    minimalism for its own sake — the corpus is my own work notes, and the
+    cheapest way to guarantee they are never transmitted anywhere is to build
+    something structurally incapable of transmitting them.
+  </p>
+
+  <h2>Tradeoffs</h2>
+  <dl class="tradeoffs">
+    <dt>A local embedding model is weaker than a hosted one.</dt>
+    <dd>
+      A small ONNX model does not match a frontier embedding API on retrieval
+      quality. I took the loss deliberately: the data must not leave the machine,
+      and lexical search covers a meaningful share of what the smaller model
+      misses.
+    </dd>
+    <dt>Cosine over a flat array does not scale.</dt>
+    <dd>
+      It is a linear scan. At a few thousand chunks that is imperceptible; at a
+      million it would be unusable, and the answer would be an approximate index.
+      Building that now would have been solving a problem I do not have.
+    </dd>
+    <dt>The parser is coupled to my own note format.</dt>
+    <dd>
+      It reads a specific heading structure. That made it fast to write and means
+      it is not a general-purpose tool. For a personal utility that is the right
+      trade; for anything shared it would need a real document abstraction.
+    </dd>
+    <dt>No tests.</dt>
+    <dd>
+      Honestly, this is the weak spot. The parsing and fusion logic are the two
+      places a silent regression would be most costly and least visible, and they
+      are exactly what a small test suite should cover. It is the next thing I
+      will add.
+    </dd>
+  </dl>
+
+  <h2>Outcome</h2>
+  <p>
+    It works, and I use it. The index covers 49 cases as roughly 3,400 chunks,
+    and a query returns useful results in well under a second. The behaviour I
+    was actually after — typing a half-remembered symptom and getting back the
+    case where I had seen it before — is the part that turned out to be worth the
+    build.
+  </p>
+
+  <h2>What I would do differently</h2>
+  <p>
+    Write the tests first, for the two functions above. Separate the note parser
+    from the retrieval core behind a small interface, so the interesting half is
+    reusable and the format-specific half is replaceable. And keep the generated
+    index somewhere outside the project directory from the start — colocating
+    derived data with source code is how derived data eventually gets committed
+    by accident.
+  </p>
+
+  <div class="note">
+    <p>
+      <strong>On the source.</strong> The code is publishable and the index is
+      not — it is built from my own support case notes, which contain customer
+      information that cannot leave my machine under any circumstances. If you
+      want to look at the retrieval logic, ask me and I will walk you through it.
+    </p>
+  </div>
+
+</main>
+
+<div class="wrap">
+  <footer class="site-foot">
+    <span>© 2026 Heewon Ko</span>
+    <span><a href="/work/">All work</a></span>
+  </footer>
+</div>
+</body>
+</html>

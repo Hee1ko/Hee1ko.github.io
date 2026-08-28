@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A multi-agent pipeline for technical diagnosis — Heewon Ko</title>
+<meta name="description" content="An architecture write-up: why a script rather than a language model should hold the control flow in a multi-agent pipeline, and what redundant investigation plus independent verification buys you.">
+<link rel="canonical" href="https://hee1ko.dev/work/hwknest/">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="wrap">
+  <header class="site-head">
+    <a class="brand" href="/">Heewon&nbsp;Ko</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="/">Home</a>
+      <a href="/work/" aria-current="page">Work</a>
+      <a href="/resume/">Resume</a>
+      <a href="/about/">About</a>
+    </nav>
+  </header>
+</div>
+
+<main id="main" class="prose">
+
+  <p style="font-size:var(--fs-meta);color:var(--ink3);margin-bottom:var(--sp-3)">
+    <a href="/work/">← Work</a>
+  </p>
+
+  <h1>A multi-agent pipeline for technical diagnosis</h1>
+  <p class="proj-lede">
+    A script holds the control flow. The agents do the thinking. Nothing gets
+    written until an independent run has confirmed it.
+  </p>
+
+  <dl class="proj-meta">
+    <div><dt>Year</dt><dd>2026</dd></div>
+    <div><dt>Role</dt><dd>Sole author</dd></div>
+    <div><dt>Scale</dt><dd>~65 tool modules, ~1,900 tests</dd></div>
+    <div><dt>Stack</dt><dd>Python, shell, agent runtime</dd></div>
+  </dl>
+
+  <div class="note">
+    <p>
+      <strong>This page is an architecture write-up, not a code release.</strong>
+      The tool runs inside my employer's environment against internal systems, so
+      the source, the system names and anything it has ever processed cannot
+      appear on a public site. What follows is the design and the reasoning, which
+      are mine to discuss. Numbers describe the shape of the codebase, not any
+      customer or any outcome.
+    </p>
+  </div>
+
+  <h2>The problem</h2>
+  <p>
+    Deep technical investigation starts cold every single time. Each new problem
+    begins with the same unpaid work: assemble the context, find out what has
+    already been tried, work out which of a hundred diagnostic tools is the
+    relevant one, and only then start thinking. The thinking is the valuable part
+    and it is the smallest part of the elapsed time.
+  </p>
+  <p>
+    The obvious move is to hand the whole thing to a language model and ask it to
+    investigate. I tried that. It fails in a specific and instructive way: a model
+    holding its own control flow will declare victory early. It finds a plausible
+    cause, stops looking, and writes a confident answer. For diagnosis work,
+    confidently wrong is materially worse than slow.
+  </p>
+
+  <h2>The approach</h2>
+  <p>
+    So I inverted it. <strong>A plain script owns the control flow; the agents are
+    called into fixed slots.</strong> The step order is not a decision the model
+    gets to make. This one choice is where most of the reliability comes from —
+    the pipeline cannot skip verification to save effort, because skipping is not
+    something it is able to express.
+  </p>
+  <p>Four ideas do the work:</p>
+  <ul>
+    <li>
+      <strong>A rule-based depth gate.</strong> Not every problem deserves the
+      full pipeline. A deterministic check decides whether to hold, draft only, or
+      investigate properly. Deciding this in code rather than by asking a model
+      keeps cost proportional to difficulty and makes the decision auditable.
+    </li>
+    <li>
+      <strong>Redundant parallel investigation, then reconciliation.</strong>
+      Three investigators run over the same problem independently and without
+      seeing each other's work, and a fourth pass reconciles them. Where they
+      agree, confidence is earned rather than asserted. Where they disagree, the
+      disagreement is itself the most useful signal in the whole run — it points
+      precisely at the part that is genuinely ambiguous.
+    </li>
+    <li>
+      <strong>Build, then independently verify.</strong> A reproduction is
+      constructed in my own sandbox, and then a second, separate run has to
+      reproduce it again from scratch before the finding is allowed through. A
+      claim that only survives the run that produced it has not been tested.
+    </li>
+    <li>
+      <strong>Contract-driven steps.</strong> Every step declares the artifacts it
+      must produce. Coordination between agents happens entirely through files in
+      a shared directory — no message bus, no shared memory, no live protocol
+      between agents. Any step can be inspected, re-run, or resumed on its own,
+      and the whole run leaves a readable audit trail on disk as a side effect
+      rather than as a feature someone had to build.
+    </li>
+  </ul>
+
+  <h2>Architecture</h2>
+  <p>
+    Four layers, each depending only on the one below. Backends wrap the systems
+    that hold the data. Tools are self-contained scripts, each doing one thing,
+    each independently runnable and testable. A shared core holds authentication
+    and the common data handling. Orchestration sits on top and is deliberately
+    the thinnest layer.
+  </p>
+  <p>
+    Files are the integration surface throughout. It is unfashionable and it is
+    the reason the thing is debuggable: when a run goes wrong, the intermediate
+    state is sitting on disk in a format I can read.
+  </p>
+
+  <h2>Tradeoffs</h2>
+  <dl class="tradeoffs">
+    <dt>Redundant investigation costs three times as much.</dt>
+    <dd>
+      Three parallel investigators mean three times the compute for one answer.
+      I judged that worthwhile because the failure mode being bought off — a
+      confident wrong conclusion reaching a person who then acts on it — is far
+      more expensive than the compute. That trade would not hold for a
+      low-stakes task.
+    </dd>
+    <dt>A fixed step order cannot adapt.</dt>
+    <dd>
+      A model-driven orchestrator could shortcut an obvious case or invent a step
+      I never anticipated. Mine cannot. I gave up that flexibility for
+      predictability, and the depth gate recovers some of it in a way I can
+      inspect. If the shape of the work changed substantially, this would be the
+      first constraint to bite.
+    </dd>
+    <dt>File-based coordination does not scale out.</dt>
+    <dd>
+      It assumes a shared filesystem and a single host. That is fine for what
+      this is and would be wrong for a real distributed service, which would need
+      a proper state store and an actual workflow engine.
+    </dd>
+    <dt>Some of it is only exercised on synthetic input.</dt>
+    <dd>
+      Parts of the pipeline have run end to end on real work; other paths have
+      only been proven against test fixtures. I try to be precise about which is
+      which, because a demo that quietly conflates the two is how people end up
+      trusting something that has never actually run.
+    </dd>
+  </dl>
+
+  <h2>Outcome</h2>
+  <p>
+    The part I did not predict is the most useful: the reconciliation step turned
+    out to be the highest-value component, not the investigation. Three
+    independent passes disagreeing is a far better signal about where the real
+    uncertainty lies than any single confident answer, and it is information that
+    a single-agent design structurally cannot produce.
+  </p>
+  <p>
+    The second surprise was how much of the value came from writing things down
+    in a fixed structure. Once every run produced the same artifacts in the same
+    shape, patterns across separate problems became visible — a large family of
+    superficially different cases collapsed into a much smaller set of recurring
+    root causes. That was a consequence of the contract, not a feature anyone
+    designed.
+  </p>
+
+  <h2>What I would do differently</h2>
+  <p>
+    Build the verification gate first. I built investigation first because it is
+    the interesting part, and spent longer than I should have trusting outputs
+    that had not been independently confirmed. Everything that made this reliable
+    is downstream of "prove it twice", and that should have been step one rather
+    than an improvement I arrived at.
+  </p>
+  <p>
+    I would also keep the documentation honest from the start. The write-ups drifted
+    from the code faster than I expected, to the point where the docs described an
+    earlier design. Now I verify claims against the source before repeating them,
+    including on this page.
+  </p>
+
+</main>
+
+<div class="wrap">
+  <footer class="site-foot">
+    <span>© 2026 Heewon Ko</span>
+    <span><a href="/work/">All work</a></span>
+  </footer>
+</div>
+</body>
+</html>

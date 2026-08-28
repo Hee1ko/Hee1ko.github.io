@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A presentation engine that checks its own layout — Heewon Ko</title>
+<meta name="description" content="Slides as a plain data array with no framework, plus an in-page probe that measures every slide for overflow and reports it to a headless browser.">
+<link rel="canonical" href="https://hee1ko.dev/work/deck-engine/">
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/tokens.css">
+<link rel="stylesheet" href="/assets/css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="wrap">
+  <header class="site-head">
+    <a class="brand" href="/">Heewon&nbsp;Ko</a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="/">Home</a>
+      <a href="/work/" aria-current="page">Work</a>
+      <a href="/resume/">Resume</a>
+      <a href="/about/">About</a>
+    </nav>
+  </header>
+</div>
+
+<main id="main" class="prose">
+
+  <p style="font-size:var(--fs-meta);color:var(--ink3);margin-bottom:var(--sp-3)">
+    <a href="/work/">← Work</a>
+  </p>
+
+  <h1>A presentation engine that checks its own layout</h1>
+  <p class="proj-lede">
+    Slides as a plain data array, about forty lines of JavaScript, and a probe
+    that measures every slide for overflow so I do not have to trust my own eyes.
+  </p>
+
+  <dl class="proj-meta">
+    <div><dt>Year</dt><dd>2026</dd></div>
+    <div><dt>Role</dt><dd>Sole author</dd></div>
+    <div><dt>Size</dt><dd>~40 lines of engine JS</dd></div>
+    <div><dt>Stack</dt><dd>HTML, CSS, vanilla JS</dd></div>
+  </dl>
+
+  <h2>The problem</h2>
+  <p>
+    I needed to build a technical presentation with real diagrams, and I wanted it
+    to be a file I could version, diff and open anywhere — not a binary in someone
+    else's format. The obvious answer is one of the HTML slide frameworks, and the
+    obvious answer was too much: a build step and a dependency tree to render
+    fourteen pages of mostly text and boxes.
+  </p>
+  <p>
+    The actual problem, though, was not authoring. It was that <strong>I could not
+    tell whether a slide was broken.</strong> Content overflowing its slide is
+    invisible when you build at one window size and present at another. I found
+    out the hard way, mid-review, that a diagram had been quietly sitting on top of
+    a slide number for several days.
+  </p>
+
+  <h2>The approach</h2>
+  <p>
+    Slides are a JavaScript array. Each entry is an object with a CSS class, a
+    footer label, and a string of HTML. The whole engine is a <code>map</code> over
+    that array into <code>&lt;section&gt;</code> elements, plus keyboard and click
+    navigation, plus one scaling function. There is no build step, no bundler, and
+    nothing to install. Editing a slide is editing one array element.
+  </p>
+  <p>
+    Fitting is one line of arithmetic: take the smaller of the width and height
+    ratios between the window and a fixed 1280×800 stage, and set it as a CSS
+    custom property that a transform reads. The deck is laid out once at fixed
+    pixel dimensions and then scaled, which means layout is completely
+    deterministic and identical on every screen.
+  </p>
+  <p>
+    The part I would keep in any future version is <strong>the QA probe</strong>.
+    On load, it walks every slide and measures whether any element extends past
+    the slide's usable area, then writes a machine-readable verdict into a hidden
+    element. A headless browser loads the deck, greps that one line, and either
+    reports clean or names the offending element. Layout correctness became a
+    check I can run in two seconds instead of a thing I squint at.
+  </p>
+
+  <h2>Two bugs in the probe worth writing down</h2>
+  <p>
+    The probe was wrong twice before it was right, and both mistakes are the kind
+    that generalise.
+  </p>
+  <ul>
+    <li>
+      <strong>Scaled versus unscaled pixels.</strong>
+      <code>getBoundingClientRect()</code> returns on-screen pixels, which are
+      post-transform, while the layout constants are unscaled CSS pixels. Mixing
+      the two made the probe report phantom failures at one window size and hide
+      real ones at another. The fix is to neutralise the scale to 1 for the
+      duration of the measurement and restore it afterwards. A measuring
+      instrument that changes its answer depending on your window size is not
+      measuring anything.
+    </li>
+    <li>
+      <strong>Measure against the real obstacle.</strong> The first version
+      compared against a guessed padding value with a fudge factor added. It
+      passed while a diagram sat on top of the slide number. The fix was to
+      measure against the footer rule's actual position. If you find yourself
+      adding a magic constant to make a check pass, the check is testing the
+      wrong thing.
+    </li>
+  </ul>
+
+  <h2>Tradeoffs</h2>
+  <dl class="tradeoffs">
+    <dt>The deck requires JavaScript.</dt>
+    <dd>
+      No JS, no slides. For a presentation that is acceptable, but it means a deck
+      can never be the only copy of an argument — anything that matters has to
+      exist as prose or as a PDF too.
+    </dd>
+    <dt>Slide content is HTML strings inside a JS array.</dt>
+    <dd>
+      No syntax highlighting inside the string, no template checking, and an
+      unclosed tag is found at runtime. In exchange the whole authoring model is
+      one array with no build step. At fourteen slides that is clearly the right
+      trade; at a hundred it would not be.
+    </dd>
+    <dt>A fixed 1280×800 stage is not responsive.</dt>
+    <dd>
+      It scales, which is not the same thing. It is fine on any laptop or
+      projector and genuinely poor on a phone. It is a presentation tool, and I
+      decided not to pretend otherwise.
+    </dd>
+    <dt>Per-slide CSS classes collide across decks.</dt>
+    <dd>
+      Numbered per-slide selectors are convenient and do not survive two decks
+      sharing a stylesheet. Shared primitives belong in the common sheet and
+      per-slide overrides need a namespace. I found this out by having two decks.
+    </dd>
+  </dl>
+
+  <h2>Outcome</h2>
+  <p>
+    Fourteen slides, one self-contained file, and a layout check that runs in
+    about two seconds. The deck I built with it did its job. More usefully, the
+    probe changed how I work: once a visual property is machine-checkable, you stop
+    negotiating with yourself about whether it is probably fine.
+  </p>
+
+  <h2>What I would do differently</h2>
+  <p>
+    Split the engine from the content from the start. My first version inlined
+    everything into one file — including base64-encoded fonts, which made the file
+    198 KB and meant a second deck would have been a copy-paste of the whole
+    thing. The right shape, which this site now uses, is a shared stylesheet and
+    engine plus a small data file per deck.
+  </p>
+  <p>
+    I would also gate the probe behind a query parameter rather than running it on
+    every load. As built, every viewer pays for a full layout pass over every
+    slide to produce a diagnostic only I read.
+  </p>
+
+</main>
+
+<div class="wrap">
+  <footer class="site-foot">
+    <span>© 2026 Heewon Ko</span>
+    <span><a href="/work/">All work</a></span>
+  </footer>
+</div>
+</body>
+</html>
