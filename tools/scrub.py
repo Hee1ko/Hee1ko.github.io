@@ -246,7 +246,10 @@ def scan_text(path, text, salt, hashes, max_n, local_terms) -> tuple[list[Findin
             findings.append(Finding(path, lineno, category, severity, shown, excerpt, hit))
 
         # 12-digit account IDs, documentation placeholders allowed.
-        for m in re.finditer(r"(?<![\d.])\d{12}(?![\d.])", line):
+        # The lookarounds exclude hex neighbours as well as digits: a 12-digit
+        # run inside a git SHA or other hash is not an account ID. This fired
+        # for real on a tree listing containing blob 082deefa673815359684b689.
+        for m in re.finditer(r"(?<![\da-fA-F.])\d{12}(?![\da-fA-F.])", line):
             if m.group(0) not in DUMMY_ACCOUNTS:
                 findings.append(Finding(path, lineno, "account-id", BLOCK,
                                         f"12-digit AWS account ID: {m.group(0)}", excerpt))
@@ -343,10 +346,18 @@ def main() -> int:
         findings, suppressed = scan_text("<stdin>", text, salt, hashes, max_n, local_terms)
         scanned = 1
     elif args.history:
+        # Only blobs hold file content. rev-list --objects also lists trees and
+        # commits, and `cat-file -p` on a tree prints a listing of SHAs that
+        # trips the account-ID rule.
+        blob_shas = {
+            ln.split()[0] for ln in
+            git("cat-file", "--batch-all-objects", "--batch-check").splitlines()
+            if len(ln.split()) >= 2 and ln.split()[1] == "blob"
+        }
         blobs = set()
         for line in git("rev-list", "--all", "--objects").splitlines():
             parts = line.split(" ", 1)
-            if len(parts) == 2 and parts[1].strip():
+            if len(parts) == 2 and parts[1].strip() and parts[0] in blob_shas:
                 blobs.add((parts[0], parts[1].strip()))
         for sha, rel in sorted(blobs):
             if rel in SELF_EXEMPT or Path(rel).suffix.lower() in SKIP_SUFFIXES:
@@ -454,6 +465,8 @@ def self_test() -> int:
         "2015-2022 - Seoul, Brazil, Sydney",
         "font-family: -apple-system, 'Segoe UI', sans-serif;",
         "reduced p95 latency by 40% across the fleet",
+        "100644 blob 082deefa673815359684b689b5f500c3456f268a\tindex.html",
+        "commit 1a2b3c4d5e6f708192a3b4c5d6e7f8091a2b3c4d",
     ]
 
     ok = True
