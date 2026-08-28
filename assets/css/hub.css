@@ -76,8 +76,10 @@ body.hub-page {
 }
 .hub-name {
   font-family: var(--font-display); font-weight: 700;
-  font-size: var(--fs-3); color: var(--ink);
-  letter-spacing: -0.02em; margin: 0;
+  font-size: 1.05rem; color: var(--ink);
+  /* A caps wordmark needs POSITIVE tracking. The negative letter-spacing that
+     suited "Heewon Ko" as a name makes "HEE1KO" read as a cramped acronym. */
+  letter-spacing: 0.14em; margin: 0;
 }
 .hub-creds {
   font-family: var(--font-mono); font-size: var(--fs-micro);
